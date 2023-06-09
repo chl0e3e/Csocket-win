@@ -139,7 +139,10 @@ int GetCsockSSLIdx()
 }
 
 #ifdef _WIN32
-
+#ifndef WSPRAG
+#pragma comment(lib, "ws2_32.lib")
+#define WSPRAG
+#endif
 #if defined(_WIN32) && (!defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0600))
 //! thanks to KiNgMaR @ #znc for this wrapper
 static int inet_pton( int af, const char *src, void *dst )
@@ -3645,8 +3648,8 @@ void CSocketManager::DynamicSelectLoop( uint64_t iLowerBounds, uint64_t iUpperBo
 		CS_GETTIMEOFDAY( &tNow, NULL );
 		timeval tSelectTimeout = GetDynamicSleepTime( tNow, tMaxResolution );
 		uint64_t iSelectTimeout = tSelectTimeout.tv_sec * 1000000 + tSelectTimeout.tv_usec;
-		iSelectTimeout = std::max( iLowerBounds, iSelectTimeout );
-		iSelectTimeout = std::min( iSelectTimeout, iUpperBounds );
+		iSelectTimeout = max( iLowerBounds, iSelectTimeout );
+		iSelectTimeout = min( iSelectTimeout, iUpperBounds );
 		if( iLowerBounds != iSelectTimeout )
 			SetSelectTimeout( iSelectTimeout );
 	}
@@ -3851,7 +3854,7 @@ int CSocketManager::Select( std::map< cs_sock_t, short > & miiReadyFds, struct t
 	int iTimeout = ( int )( tvtimeout->tv_usec / 1000 );
 	iTimeout += ( int )( tvtimeout->tv_sec * 1000 );
 	size_t uMaxFD = miiReadyFds.size();
-	int iRet = poll( pFDs, uMaxFD, iTimeout );
+    int iRet = WSAPoll(pFDs, uMaxFD, iTimeout);
 	miiReadyFds.clear();
 	for( uCurrPoll = 0; uCurrPoll < uMaxFD; ++uCurrPoll )
 	{

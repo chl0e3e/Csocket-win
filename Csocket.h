@@ -164,7 +164,7 @@ typedef ssize_t cs_ssize_t;
 #endif
 
 #ifdef CSOCK_USE_POLL
-#include <poll.h>
+//#include <poll.h>
 #endif /* CSOCK_USE_POLL */
 
 #ifdef HAVE_UNIX_SOCKET
